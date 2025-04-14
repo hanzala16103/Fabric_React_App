@@ -15,6 +15,9 @@ function Layout() {
         height: 60,
         fill: 'purple'
       });
+      newRect.animate('angle', 45, {
+        onChange: canvas.renderAll.bind(canvas)
+      });
       canvas.add(newRect);
       canvas.renderAll();
     }
@@ -30,6 +33,7 @@ function Layout() {
         selectable:true
       });
       canvas.add(newTri);
+      canvas.renderAll();
     }
   };
   const addCircle = () => {
@@ -45,6 +49,26 @@ function Layout() {
       canvas.renderAll();
     }
   };
+  const addImage = () => {
+    if (canvas) {
+      const imageUrl = 'https://images.pexels.com/photos/674010/pexels-photo-674010.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2';
+
+      fabric.Image.fromURL(imageUrl, (img) => {
+        img.set({
+          left: 150,
+          top: 150,
+          scaleX: 0.5,
+          scaleY: 0.5,
+          selectable: true,
+          flipX:true
+        });
+
+        canvas.add(img);
+        canvas.renderAll();
+      });
+    }
+  };
+
 
   return (
     <>
@@ -55,6 +79,7 @@ function Layout() {
               { btnTitle: "Add Rectangle", AddShape: addRect },
               { btnTitle: "Add Triangle", AddShape: addTriangle },
               { btnTitle: "Add Circle", AddShape: addCircle },
+              { btnTitle: "Add Image", AddShape: addImage },
             ]}
           />
         <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>

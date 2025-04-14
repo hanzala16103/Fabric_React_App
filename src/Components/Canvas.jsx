@@ -18,6 +18,8 @@ function CanvasBoard(props) {
     });
 
     dispatch(setCanvas(fabricCanvas));
+    const text = new fabric.Text('hello world', { left: 100, top: 100 });
+    fabricCanvas.add(text);
 
     window.canvas=fabricCanvas;
 
