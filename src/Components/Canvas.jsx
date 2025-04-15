@@ -18,9 +18,12 @@ function CanvasBoard(props) {
     });
 
     dispatch(setCanvas(fabricCanvas));
-    const text = new fabric.Text('hello world', { left: 100, top: 100 });
-    fabricCanvas.add(text);
 
+    fabricCanvas.on('mouse:down', function(options) {
+      if (options.target) {
+        console.log('an object was clicked! ', options.target.type);
+      }
+    });
     window.canvas=fabricCanvas;
 
   }, []);

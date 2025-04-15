@@ -68,6 +68,86 @@ function Layout() {
       });
     }
   };
+  const addText=()=>{
+    if (canvas) {
+      const text = new fabric.Textbox('Text object, with different properties of font styling.', {
+        fontStyle: 'italic',
+        fontFamily: 'Delicious',
+        stroke: '#ff1318',
+        strokeWidth: 1,
+        textBackgroundColor: 'rgb(0,200,0)',
+        isDesignText:true
+      })
+      canvas.add(text);
+      canvas.renderAll();
+    }
+  }
+  const groupAllObjects = () => {
+    if (!canvas) return;
+
+    const objects = canvas.getObjects().concat(); // Clone to avoid live reference
+
+    if (objects.length === 0) return;
+
+    // Remove all objects, but keep canvas settings
+    objects.forEach(obj => canvas.remove(obj));
+
+    const group = new fabric.Group(objects, {
+      left: 100,
+      top: 100,
+      selectable: true
+    });
+
+    canvas.add(group);
+    canvas.setActiveObject(group);
+    canvas.renderAll();
+  };
+  const ungroupObjects = () => {
+    if (!canvas) return;
+
+    const activeObject = canvas.getActiveObject();
+
+    if (activeObject && activeObject.type === 'group') {
+      const items = activeObject._objects;
+
+      activeObject._restoreObjectsState();
+      canvas.remove(activeObject);
+
+      items.forEach(item => {
+        canvas.add(item);
+      });
+
+      canvas.renderAll();
+    }
+  };
+  const saveCanvas = () => {
+    if (canvas) {
+      const json = JSON.stringify(canvas.toJSON());
+      localStorage.setItem("myCanvas", json);
+      alert("Canvas saved!");
+      canvas.getObjects().forEach(obj => canvas.remove(obj));
+      canvas.renderAll();
+    }
+  };
+  const loadCanvas = () => {
+    if (canvas) {
+      const saved = localStorage.getItem("myCanvas");
+      if (saved) {
+        canvas.loadFromJSON(saved, () => {
+          canvas.renderAll();
+          alert("Canvas loaded!");
+        });
+      } else {
+        alert("No saved canvas found!");
+      }
+    }
+  };
+const downloadCanvas=()=>{
+  if (canvas) {
+    const svg = canvas.toSVG();
+  }
+}
+
 
 
   return (
@@ -80,6 +160,11 @@ function Layout() {
               { btnTitle: "Add Triangle", AddShape: addTriangle },
               { btnTitle: "Add Circle", AddShape: addCircle },
               { btnTitle: "Add Image", AddShape: addImage },
+              { btnTitle: "AddText", AddShape: addText },
+              { btnTitle: "Group All", AddShape: groupAllObjects },
+              { btnTitle: "Ungroup", AddShape: ungroupObjects },
+              { btnTitle: "Save Canvas", AddShape: saveCanvas },
+              { btnTitle: "Load saved Canvas", AddShape: loadCanvas },
             ]}
           />
         <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
@@ -87,8 +172,7 @@ function Layout() {
         </div>
         <PageCard
           title={'Properties'}
-          btnTitle=""
-          AddShape={() => {}}
+
         />
       </div>
     </>
