@@ -4,9 +4,7 @@ import { useDispatch } from 'react-redux';
 import { setCanvas } from '../Store/reducers/CanvasSlice';
 function CanvasBoard(props) {
   const dispatch = useDispatch();
-  const addRectangle=()=>{
 
-  }
 
   useEffect(() => {
 
@@ -21,7 +19,7 @@ function CanvasBoard(props) {
 
     fabricCanvas.on('mouse:down', function(options) {
       if (options.target) {
-        console.log('an object was clicked! ', options.target.type);
+        console.log('an object clicked is: ', options.target.type);
       }
     });
     window.canvas=fabricCanvas;

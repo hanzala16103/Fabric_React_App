@@ -1,11 +1,30 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import PageCard from "./Card";
 import CanvasBoard from "./Canvas";
 import { useSelector } from 'react-redux';
 import { fabric } from 'fabric';
 function Layout() {
   const canvas = useSelector((state) => state.canvas.canvasInstance);
+  const [selectedObject, setSelectedObject] = useState(null);
 
+  useEffect(() => {
+    if (!canvas) return;
+
+    const updateSelection = () => {
+      const obj = canvas.getActiveObject();
+      setSelectedObject(obj || null);
+    };
+
+    canvas.on('selection:created', updateSelection);
+    canvas.on('selection:updated', updateSelection);
+    canvas.on('selection:cleared', () => setSelectedObject(null));
+
+    return () => {
+      canvas.off('selection:created', updateSelection);
+      canvas.off('selection:updated', updateSelection);
+      canvas.off('selection:cleared');
+    };
+  }, [canvas]);
   const addRect = () => {
     if (canvas) {
       const newRect = new fabric.Rect({
@@ -76,6 +95,7 @@ function Layout() {
         stroke: '#ff1318',
         strokeWidth: 1,
         textBackgroundColor: 'rgb(0,200,0)',
+        underline:true,
         isDesignText:true
       })
       canvas.add(text);
@@ -148,8 +168,14 @@ const downloadCanvas=()=>{
   }
 }
 
-
-
+const getProperties=()=>{
+  if(canvas){
+    const properties= canvas.getActiveObjects();
+    if(properties){
+      console.log({properties})
+    }
+  }
+}
   return (
     <>
       <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
@@ -165,15 +191,48 @@ const downloadCanvas=()=>{
               { btnTitle: "Ungroup", AddShape: ungroupObjects },
               { btnTitle: "Save Canvas", AddShape: saveCanvas },
               { btnTitle: "Load saved Canvas", AddShape: loadCanvas },
+              { btnTitle: "Properties", AddShape: getProperties },
             ]}
           />
         <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
           <CanvasBoard />
         </div>
-        <PageCard
-          title={'Properties'}
-
-        />
+        <PageCard title={'Properties'}>
+          {!selectedObject ? (
+            <p>No object selected.</p>
+          ) : (
+            <>
+              <p><strong>Type:</strong> {selectedObject.type}</p>
+              <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
+                {Object.entries(selectedObject)
+                  .filter(([key, value]) => (
+                    typeof value !== 'function' &&
+                    typeof value !== 'object' &&
+                    key !== '__eventListeners' &&
+                    key !== 'canvas'
+                  ))
+                  .map(([key, value]) => (
+                    <p key={key}>
+                      <strong>{key}:</strong> {String(value)}
+                    </p>
+                  ))}
+              </div>
+            </>
+          )}
+          {selectedObject?.type === 'textbox' && (
+            <div style={{ marginTop: '1rem' }}>
+              <button
+                onClick={() => {
+                  const isBold = selectedObject.fontWeight === 'bold';
+                  selectedObject.set('fontWeight', isBold ? 'normal' : 'bold');
+                  selectedObject.canvas.renderAll();
+                }}
+              >
+                {selectedObject.fontWeight === 'bold' ? 'Unbold' : 'Bold'}
+              </button>
+            </div>
+          )}
+        </PageCard>
       </div>
     </>
   );

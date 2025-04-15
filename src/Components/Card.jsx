@@ -6,10 +6,11 @@ function PageCard(props) {
     <>
       <Card title={props.title} variant="borderless" style={{width: 300,height: '100vh', background: 'rgb(210 209 209)'}}>
         {buttons.map((button, index) => (
-          <Button key={index} type="primary" onClick={button.AddShape} style={{ marginBottom: '10px' }}>
+          <Button key={index} type="primary" onClick={button.AddShape} style={{ marginBottom: '10px',gap:'1rem' }}>
             {button.btnTitle}
           </Button>
         ))}
+        {props.children}
       </Card>
     </>
   );
